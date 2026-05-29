@@ -12,32 +12,47 @@
 
 <div class="row">
     <div class="col-md-7">
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-diagram-3-fill me-2"></i>Configuración del Grafo</h5>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-diagram-3-fill me-2"></i>Editor Visual de Grafo</h5>
             </div>
             <div class="card-body">
-                <form action="/ruta" method="post">
+                <div class="alert alert-info small py-2 mb-3">
+                    <i class="bi bi-info-circle-fill me-2"></i><strong>Instrucciones:</strong> 
+                    Utiliza los botones del editor de abajo para <b>Añadir Nodos</b> y <b>Añadir Aristas</b> (arrastrando de un nodo a otro). El JSON se actualizará automáticamente.
+                </div>
+                
+                <!-- Vis-Network Container -->
+                <div id="mynetwork" class="border rounded bg-light mb-3" style="height: 400px;"></div>
+
+                <form action="/ruta" method="post" id="ruta-form">
                     <div class="row mb-3">
                         <div class="col">
-                            <label class="form-label">Nodo Inicio</label>
-                            <input type="text" name="inicio" class="form-control" value="{{ inicio_default }}" required>
+                            <label class="form-label fw-bold">Nodo Inicio</label>
+                            <input type="text" name="inicio" id="input-inicio" class="form-control" value="{{ inicio_default }}" required>
                         </div>
                         <div class="col">
-                            <label class="form-label">Nodo Fin</label>
-                            <input type="text" name="fin" class="form-control" value="{{ fin_default }}" required>
+                            <label class="form-label fw-bold">Nodo Fin</label>
+                            <input type="text" name="fin" id="input-fin" class="form-control" value="{{ fin_default }}" required>
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Definición del Grafo (JSON)</label>
-                        <textarea name="grafo_json" class="form-control font-monospace" rows="12" required>{{ grafo_default }}</textarea>
-                        <div class="form-text text-muted">
-                            Estructura: {"NodoA": {"NodoB": peso, "NodoC": peso}, ...}
+                        <label class="form-label fw-bold d-flex justify-content-between">
+                            Datos del Grafo (Sincronizado)
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#jsonCollapse">
+                                Mostrar/Ocultar JSON
+                            </button>
+                        </label>
+                        <div class="collapse" id="jsonCollapse">
+                            <textarea name="grafo_json" id="grafo-json" class="form-control font-monospace text-muted" rows="6" required>{{ grafo_default }}</textarea>
+                            <div class="form-text">Si modificas este JSON manualmente, el gráfico de arriba se actualizará al perder el foco.</div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100">Calcular Ruta</button>
+                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Calcular Ruta Óptima
+                    </button>
                 </form>
             </div>
         </div>
@@ -45,31 +60,40 @@
 
     <div class="col-md-5">
         {% if resultado %}
-        <div class="card bg-light border-success mb-4">
+        <div class="card bg-light border-success mb-4 shadow-sm">
             <div class="card-body text-center">
                 <h6 class="text-success text-uppercase small fw-bold">Latencia Mínima</h6>
                 <h2 class="display-4 fw-bold">{{ resultado.latencia }}<small class="h6">ms</small></h2>
                 <hr>
                 <h6>Ruta Recomendada:</h6>
                 <div class="mt-3">
-                    <div class="p-3 bg-white rounded border border-success-subtle font-monospace">
+                    <div class="p-3 bg-white rounded border border-success-subtle font-monospace fw-bold text-success fs-5">
                         {{ resultado.ruta }}
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-robot me-2"></i>Análisis de IA</h6>
-                {% if resultado %}
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <h6 class="mb-0"><i class="bi bi-robot me-2 text-info"></i>Análisis de IA (CTO)</h6>
                 <button id="btn-pdf" class="btn btn-sm btn-outline-danger d-none" onclick="downloadPDF()">
                     <i class="bi bi-file-pdf"></i> PDF
                 </button>
-                {% endif %}
             </div>
             <div id="ia-container" class="card-body">
-                <button class="btn btn-sm btn-info w-100" onclick="getAIAnalysis()">Consultar a la IA (CTO)</button>
+                <button class="btn btn-info w-100 text-white fw-bold" onclick="getAIAnalysis()">Solicitar Recomendación Estratégica</button>
+            </div>
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="bi bi-lightbulb-fill me-2"></i>¿Cómo usar la herramienta?</h5>
+                <ol class="small ps-3 mb-0">
+                    <li class="mb-2">Añade los nodos que representan tus servidores o ubicaciones.</li>
+                    <li class="mb-2">Conecta los nodos arrastrando desde el origen hasta el destino e indica la latencia (peso) en ms.</li>
+                    <li>Selecciona el <b>Nodo Inicio</b> y el <b>Nodo Fin</b>, y haz clic en Calcular.</li>
+                </ol>
             </div>
         </div>
         {% endif %}
@@ -83,10 +107,217 @@
     <input type="hidden" name="ia_analisis" id="pdf-ia">
 </form>
 
+<!-- Include Vis-Network -->
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+<script>
+    // Referencias
+    const textarea = document.getElementById('grafo-json');
+    const currentRoute = "{{ resultado.ruta if resultado else '' }}";
+    let isSyncing = false; // Flag to prevent infinite loops
+
+    // Inicializar Vis-Network Datasets
+    const nodesDataset = new vis.DataSet();
+    const edgesDataset = new vis.DataSet();
+
+    // Sincronizar desde Vis-Network hacia JSON
+    function updateJsonFromVis() {
+        if (isSyncing) return;
+        isSyncing = true;
+        
+        const nodes = nodesDataset.get();
+        const edges = edgesDataset.get();
+        const grafo = {};
+
+        // Inicializar todos los nodos vacíos
+        nodes.forEach(n => {
+            grafo[n.id] = {};
+        });
+
+        // Poblar conexiones
+        edges.forEach(e => {
+            if (!grafo[e.from]) grafo[e.from] = {};
+            const peso = parseInt(e.label) || 0;
+            grafo[e.from][e.to] = peso;
+        });
+
+        textarea.value = JSON.stringify(grafo, null, 2);
+        isSyncing = false;
+    }
+
+    // Suscribir los Datasets al evento de actualización
+    nodesDataset.on('*', updateJsonFromVis);
+    edgesDataset.on('*', updateJsonFromVis);
+
+    // Sincronizar desde JSON hacia Vis-Network
+    function updateVisFromJson() {
+        if (isSyncing) return;
+        isSyncing = true;
+
+        try {
+            const grafo = JSON.parse(textarea.value);
+            const newNodes = [];
+            const newEdges = [];
+            const addedNodes = new Set();
+            
+            // Determinar nodos de la ruta óptima
+            const nodosRuta = currentRoute ? currentRoute.split(' -> ') : [];
+
+            const addNode = (id) => {
+                if (!addedNodes.has(id)) {
+                    let isRouteNode = nodosRuta.includes(id);
+                    newNodes.push({
+                        id: id,
+                        label: id,
+                        color: isRouteNode ? {background: '#dcfce7', border: '#15803d'} : {background: '#e0e7ff', border: '#4338ca'},
+                        font: { color: isRouteNode ? '#15803d' : '#000000', size: 16, bold: isRouteNode },
+                        borderWidth: isRouteNode ? 3 : 1
+                    });
+                    addedNodes.add(id);
+                }
+            };
+
+            for (const [origen, conexiones] of Object.entries(grafo)) {
+                addNode(origen);
+                for (const [destino, peso] of Object.entries(conexiones)) {
+                    addNode(destino);
+                    
+                    // Verificar si es arista de la ruta
+                    let isRouteEdge = false;
+                    for (let i = 0; i < nodosRuta.length - 1; i++) {
+                        if (nodosRuta[i] === origen && nodosRuta[i+1] === destino) {
+                            isRouteEdge = true;
+                            break;
+                        }
+                    }
+
+                    newEdges.push({
+                        from: origen,
+                        to: destino,
+                        label: String(peso),
+                        color: isRouteEdge ? {color: '#15803d'} : {color: '#848484'},
+                        width: isRouteEdge ? 3 : 1,
+                        font: { size: 14, color: isRouteEdge ? '#15803d' : '#343434', strokeWidth: 3 }
+                    });
+                }
+            }
+
+            nodesDataset.clear();
+            edgesDataset.clear();
+            nodesDataset.add(newNodes);
+            edgesDataset.add(newEdges);
+            
+        } catch (e) {
+            console.error("Error parseando JSON", e);
+        }
+        isSyncing = false;
+    }
+
+    // Inicializar el contenedor de red
+    const container = document.getElementById('mynetwork');
+    const data = { nodes: nodesDataset, edges: edgesDataset };
+    const options = {
+        locale: 'es',
+        locales: {
+            es: {
+                edit: 'Editar',
+                del: 'Eliminar selección',
+                back: 'Atrás',
+                addNode: 'Añadir nodo',
+                addEdge: 'Añadir conexión',
+                editNode: 'Editar nodo',
+                editEdge: 'Editar conexión',
+                addDescription: 'Haz clic en un espacio vacío para colocar un nuevo nodo.',
+                edgeDescription: 'Haz clic en un nodo y arrastra la conexión hacia otro nodo para conectarlos.',
+                editEdgeDescription: 'Haz clic en los puntos de control y arrástralos a un nodo para conectarlos.',
+                createEdgeError: 'No se pueden conectar nodos consigo mismos.',
+                deleteClusterError: 'Los clústeres no se pueden eliminar.',
+                editClusterError: 'Los clústeres no se pueden editar.',
+                noneSelectedError: 'No hay nada seleccionado.',
+                close: 'Cerrar'
+            }
+        },
+        interaction: { hover: true },
+        physics: {
+            enabled: true,
+            solver: 'forceAtlas2Based',
+            stabilization: { enabled: true, iterations: 100 },
+            forceAtlas2Based: {
+                gravitationalConstant: -50,
+                centralGravity: 0.01,
+                springLength: 100,
+                springConstant: 0.08
+            }
+        },
+        edges: {
+            arrows: { to: { enabled: true, scaleFactor: 1.2 } },
+            smooth: { type: 'continuous', roundness: 0.3 }
+        },
+        manipulation: {
+            enabled: true,
+            initiallyActive: true,
+            addNode: function(nodeData, callback) {
+                const label = prompt("Ingrese el nombre del nuevo nodo (Ej: A, B, C):");
+                if (label) {
+                    nodeData.id = label;
+                    nodeData.label = label;
+                    callback(nodeData);
+                } else {
+                    callback(null);
+                }
+            },
+            addEdge: function(edgeData, callback) {
+                if (edgeData.from === edgeData.to) {
+                    alert("Error: No puedes conectar un nodo con él mismo.");
+                    callback(null);
+                    return;
+                }
+                const label = prompt("Ingrese la latencia de esta conexión (en ms):", "10");
+                if (label && !isNaN(label)) {
+                    edgeData.label = label;
+                    callback(edgeData);
+                } else {
+                    if (label) alert("Error: Debes ingresar un número válido para la latencia.");
+                    callback(null);
+                }
+            },
+            editEdge: function(edgeData, callback) {
+                const label = prompt("Modifique la latencia de la conexión (en ms):", edgeData.label);
+                if (label && !isNaN(label)) {
+                    edgeData.label = label;
+                    callback(edgeData);
+                } else {
+                    callback(null);
+                }
+            }
+        }
+    };
+    
+    // Crear la red
+    const network = new vis.Network(container, data, options);
+
+    // Desactivar física tras la estabilización inicial
+    network.on("stabilizationFinished", function () {
+        network.setOptions({ physics: false });
+    });
+
+    // Failsafe: Asegurar que la física esté desactivada al empezar a arrastrar
+    network.on("dragStart", function () {
+        network.setOptions({ physics: false });
+    });
+
+    // Cargar datos iniciales
+    updateVisFromJson();
+
+    // Actualizar JSON si el usuario escribe
+    textarea.addEventListener('blur', updateVisFromJson);
+
+</script>
+
 <script>
     function getAIAnalysis() {
         const container = document.getElementById('ia-container');
-        container.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-info" role="status"></div> Analizando...</div>';
+        container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-info" role="status"></div><div class="mt-2">El CTO está analizando la red...</div></div>';
         
         const data = {
             servidores: "N/A",

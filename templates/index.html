@@ -1,54 +1,182 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Calculadora Estratégica{% endblock %}
+{% block title %}Dashboard - Calculadora Estratégica Pro{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Bienvenido al Panel de Optimización</h1>
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+        --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    }
+
+    .hero-section {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .card-tool {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .card-tool:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+    }
+
+    .bg-primary-soft { background: #e0e7ff; color: #4338ca; }
+    .bg-success-soft { background: #dcfce7; color: #15803d; }
+    .bg-warning-soft { background: #fef3c7; color: #b45309; }
+
+    .feature-tag {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .section-title {
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 4px;
+        background: var(--primary-gradient);
+        border-radius: 2px;
+    }
+</style>
+
+<div class="hero-section text-center text-md-start">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-3 fw-bold mb-3">Optimización Inteligente para Decisiones Estratégicas</h1>
+            <p class="lead mb-4 opacity-90">Potencia tu infraestructura y marketing con modelos matemáticos avanzados integrados con Inteligencia Artificial.</p>
+            <div class="d-flex gap-3 flex-wrap justify-content-center justify-content-md-start">
+                <a href="#herramientas" class="btn btn-light btn-lg px-4 fw-bold">Explorar Herramientas</a>
+            </div>
+        </div>
+        <div class="col-md-4 d-none d-md-block text-center">
+            <i class="bi bi-rocket-takeoff shadow-lg p-4 rounded-circle bg-white text-primary" style="font-size: 5rem;"></i>
+        </div>
+    </div>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-hdd-network text-primary me-2"></i>Servidores</h5>
-                <p class="card-text">Maximiza el valor de tus microservicios respetando la capacidad del servidor.</p>
-                <a href="/servidores" class="btn btn-outline-primary">Abrir Calculadora</a>
+<div id="herramientas" class="mb-5">
+    <h2 class="section-title">Nuestras Herramientas</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 card-tool p-4">
+                <div class="icon-box bg-primary-soft">
+                    <i class="bi bi-hdd-network"></i>
+                </div>
+                <span class="feature-tag text-primary">Infraestructura</span>
+                <h4 class="fw-bold">Optimización de Servidores</h4>
+                <p class="text-muted">Utiliza el algoritmo de la mochila para maximizar el valor de tus microservicios bajo restricciones de capacidad.</p>
+                <div class="mt-auto">
+                    <a href="/servidores" class="btn btn-primary w-100 rounded-pill">Abrir Calculadora</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-diagram-3 text-success me-2"></i>Latencia</h5>
-                <p class="card-text">Encuentra la ruta con menor latencia entre nodos de infraestructura.</p>
-                <a href="/ruta" class="btn btn-outline-success">Abrir Calculadora</a>
+        <div class="col-md-4">
+            <div class="card h-100 card-tool p-4">
+                <div class="icon-box bg-success-soft">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+                <span class="feature-tag text-success">Redes</span>
+                <h4 class="fw-bold">Ruta Mínima</h4>
+                <p class="text-muted">Visualiza y optimiza la latencia de tu red mediante programación dinámica backward en grafos complejos.</p>
+                <div class="mt-auto">
+                    <a href="/ruta" class="btn btn-success w-100 rounded-pill">Abrir Calculadora</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-graph-up-arrow text-warning me-2"></i>Marketing</h5>
-                <p class="card-text">Calcula el ROI óptimo distribuyendo presupuesto en canales clave.</p>
-                <a href="/marketing" class="btn btn-outline-warning">Abrir Calculadora</a>
+        <div class="col-md-4">
+            <div class="card h-100 card-tool p-4">
+                <div class="icon-box bg-warning-soft">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <span class="feature-tag text-warning">Marketing</span>
+                <h4 class="fw-bold">Maximización de ROI</h4>
+                <p class="text-muted">Aplica optimización no lineal para distribuir presupuestos publicitarios de manera que maximicen el retorno.</p>
+                <div class="mt-auto">
+                    <a href="/marketing" class="btn btn-warning w-100 rounded-pill text-white">Abrir Calculadora</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-header bg-white">
-        <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Casos de Estudio Integrados</h5>
-    </div>
-    <div class="card-body">
-        <p>Esta aplicación integra los modelos matemáticos definidos en el proyecto original:</p>
-        <ul>
-            <li><strong>Programación Dinámica (Mochila):</strong> Optimización de recursos finitos.</li>
-            <li><strong>Optimización No Lineal:</strong> Maximización de funciones complejas de beneficio.</li>
-            <li><strong>Teoría de Grafos:</strong> Algoritmos de ruta mínima con memoria (DP).</li>
-        </ul>
-        <p class="text-muted small">Haz clic en cualquier calculadora para ver los ejemplos pre-cargados.</p>
+<div class="card bg-dark text-white p-5 border-0 shadow-lg mb-5" style="border-radius: 1.5rem;">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold mb-4">¿Cómo funciona nuestra tecnología?</h2>
+            <div class="d-flex mb-4">
+                <div class="me-3">
+                    <div class="bg-primary p-2 rounded-circle"><i class="bi bi-check2"></i></div>
+                </div>
+                <div>
+                    <h5>Matemáticas Avanzadas</h5>
+                    <p class="text-white-50 small">Algoritmos de programación dinámica y optimización no lineal robustos.</p>
+                </div>
+            </div>
+            <div class="d-flex mb-4">
+                <div class="me-3">
+                    <div class="bg-success p-2 rounded-circle"><i class="bi bi-eye"></i></div>
+                </div>
+                <div>
+                    <h5>Visualización en Tiempo Real</h5>
+                    <p class="text-white-50 small">Visualiza tus datos y resultados de forma instantánea con gráficos dinámicos.</p>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="me-3">
+                    <div class="bg-info p-2 rounded-circle"><i class="bi bi-robot"></i></div>
+                </div>
+                <div>
+                    <h5>Análisis por IA</h5>
+                    <p class="text-white-50 small">Interpretación de resultados por un modelo de IA especializado en arquitectura de sistemas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <div class="p-4 bg-secondary bg-opacity-10 rounded-3 border border-secondary border-opacity-25">
+                <code class="text-info">
+                    // Ejemplo de Optimización<br>
+                    function maximize_roi(budget) {<br>
+                    &nbsp;&nbsp;return - (0.5 * Math.pow(x1, 0.8) + ...);<br>
+                    }
+                </code>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
