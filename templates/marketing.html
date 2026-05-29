@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Marketing - Calculadora Estratégica{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">ROI de Marketing</li>
+  </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Optimización de Presupuesto</h5>
+            </div>
+            <div class="card-body">
+                <form action="/marketing" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Presupuesto Total (M€)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.1" name="presupuesto" class="form-control" value="{{ presupuesto_default }}" required>
+                        </div>
+                        <div class="form-text">Distribución entre Creadores de Contenido (x1) y Anuncios Programáticos (x2).</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Función de ROI</label>
+                        <div class="p-3 bg-light rounded font-monospace small">
+                            ROI = 4x1 + 5x2 - 0.2x1² - 0.3x2²
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100">Maximizar Retorno</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        {% if resultado %}
+        <div class="card bg-light border-warning mb-4">
+            <div class="card-body text-center">
+                <h6 class="text-warning text-uppercase small fw-bold">ROI Máximo Estimado</h6>
+                <h2 class="display-4 fw-bold">{{ resultado.roi }}</h2>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <h6 class="text-muted small">Inversión Creadores (x1)</h6>
+                        <h5>{{ resultado.creadores }}</h5>
+                    </div>
+                    <div class="col">
+                        <h6 class="text-muted small">Inversión Anuncios (x2)</h6>
+                        <h5>{{ resultado.anuncios }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-robot me-2"></i>Análisis de IA</h6>
+                {% if resultado %}
+                <button id="btn-pdf" class="btn btn-sm btn-outline-danger d-none" onclick="downloadPDF()">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </button>
+                {% endif %}
+            </div>
+            <div id="ia-container" class="card-body">
+                <button class="btn btn-sm btn-info w-100" onclick="getAIAnalysis()">Consultar a la IA (CTO)</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<form id="pdfForm" action="/descargar-pdf" method="post" style="display:none;">
+    <input type="hidden" name="tipo" value="Optimización de Marketing">
+    <input type="hidden" name="datos" id="pdf-datos">
+    <input type="hidden" name="resultado" id="pdf-resultado">
+    <input type="hidden" name="ia_analisis" id="pdf-ia">
+</form>
+
+<script>
+    function getAIAnalysis() {
+        const container = document.getElementById('ia-container');
+        container.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-info" role="status"></div> Analizando...</div>';
+        
+        const data = {
+            servidores: "N/A",
+            latencia: "0",
+            marketing: "ROI: {{ resultado.roi if resultado else 0 }}, Creadores: {{ resultado.creadores if resultado else 0 }}, Anuncios: {{ resultado.anuncios if resultado else 0 }}"
+        };
+
+        fetch('/analizar-ia', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'data=' + encodeURIComponent(JSON.stringify(data))
+        })
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+            document.getElementById('btn-pdf').classList.remove('d-none');
+        });
+    }
+
+    function downloadPDF() {
+        document.getElementById('pdf-datos').value = `Presupuesto Total Asignado: ${{ presupuesto_default }}M`;
+        document.getElementById('pdf-resultado').value = `ROI Máximo Estimado: {{ resultado.roi if resultado else '' }}\nInversión en Creadores (x1): {{ resultado.creadores if resultado else '' }}\nInversión en Anuncios (x2): {{ resultado.anuncios if resultado else '' }}`;
+        document.getElementById('pdf-ia').value = document.getElementById('ia-analisis-input') ? document.getElementById('ia-analisis-input').value : '';
+        document.getElementById('pdfForm').submit();
+    }
+</script>
+{% endblock %}

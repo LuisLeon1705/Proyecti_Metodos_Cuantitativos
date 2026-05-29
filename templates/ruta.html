@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Ruta Mínima - Calculadora Estratégica{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">Ruta Mínima de Latencia</li>
+  </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-diagram-3-fill me-2"></i>Configuración del Grafo</h5>
+            </div>
+            <div class="card-body">
+                <form action="/ruta" method="post">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Nodo Inicio</label>
+                            <input type="text" name="inicio" class="form-control" value="{{ inicio_default }}" required>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Nodo Fin</label>
+                            <input type="text" name="fin" class="form-control" value="{{ fin_default }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Definición del Grafo (JSON)</label>
+                        <textarea name="grafo_json" class="form-control font-monospace" rows="12" required>{{ grafo_default }}</textarea>
+                        <div class="form-text text-muted">
+                            Estructura: {"NodoA": {"NodoB": peso, "NodoC": peso}, ...}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Calcular Ruta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        {% if resultado %}
+        <div class="card bg-light border-success mb-4">
+            <div class="card-body text-center">
+                <h6 class="text-success text-uppercase small fw-bold">Latencia Mínima</h6>
+                <h2 class="display-4 fw-bold">{{ resultado.latencia }}<small class="h6">ms</small></h2>
+                <hr>
+                <h6>Ruta Recomendada:</h6>
+                <div class="mt-3">
+                    <div class="p-3 bg-white rounded border border-success-subtle font-monospace">
+                        {{ resultado.ruta }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-robot me-2"></i>Análisis de IA</h6>
+                {% if resultado %}
+                <button id="btn-pdf" class="btn btn-sm btn-outline-danger d-none" onclick="downloadPDF()">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </button>
+                {% endif %}
+            </div>
+            <div id="ia-container" class="card-body">
+                <button class="btn btn-sm btn-info w-100" onclick="getAIAnalysis()">Consultar a la IA (CTO)</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<form id="pdfForm" action="/descargar-pdf" method="post" style="display:none;">
+    <input type="hidden" name="tipo" value="Ruta Mínima de Latencia">
+    <input type="hidden" name="datos" id="pdf-datos">
+    <input type="hidden" name="resultado" id="pdf-resultado">
+    <input type="hidden" name="ia_analisis" id="pdf-ia">
+</form>
+
+<script>
+    function getAIAnalysis() {
+        const container = document.getElementById('ia-container');
+        container.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-info" role="status"></div> Analizando...</div>';
+        
+        const data = {
+            servidores: "N/A",
+            latencia: "{{ resultado.latencia if resultado else 0 }}",
+            marketing: "N/A"
+        };
+
+        fetch('/analizar-ia', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'data=' + encodeURIComponent(JSON.stringify(data))
+        })
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+            document.getElementById('btn-pdf').classList.remove('d-none');
+        });
+    }
+
+    function downloadPDF() {
+        document.getElementById('pdf-datos').value = JSON.stringify({{ raw_data | safe if raw_data else '{}' }});
+        document.getElementById('pdf-resultado').value = `Latencia Mínima: {{ resultado.latencia if resultado else '' }}ms\nRuta Recomendada: {{ resultado.ruta if resultado else '' }}`;
+        document.getElementById('pdf-ia').value = document.getElementById('ia-analisis-input') ? document.getElementById('ia-analisis-input').value : '';
+        document.getElementById('pdfForm').submit();
+    }
+</script>
+{% endblock %}

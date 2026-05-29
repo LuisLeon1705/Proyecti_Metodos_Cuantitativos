@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Servidores - Calculadora Estratégica{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">Optimización de Servidores</li>
+  </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Parámetros del Sistema</h5>
+            </div>
+            <div class="card-body">
+                <form action="/servidores" method="post" id="calcForm">
+                    <div class="mb-3">
+                        <label class="form-label">Capacidad Máxima del Servidor</label>
+                        <input type="number" name="capacidad" class="form-control" value="{{ capacidad_default }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label d-flex justify-content-between">
+                            Microservicios Disponibles
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addService()">+ Añadir</button>
+                        </label>
+                        <div id="servicesList">
+                            <!-- JS will populate this -->
+                        </div>
+                        <input type="hidden" name="servicios_json" id="servicios_json">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" onclick="updateJson()">Calcular Optimización</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        {% if resultado %}
+        <div class="card bg-light border-primary mb-4">
+            <div class="card-body text-center">
+                <h6 class="text-primary text-uppercase small fw-bold">Resultado Óptimo</h6>
+                <h2 class="display-4 fw-bold">{{ resultado.valor }}</h2>
+                <p class="text-muted">Valor total acumulado</p>
+                <hr>
+                <h6>Servidores Seleccionados:</h6>
+                <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
+                    {% for s in resultado.seleccion %}
+                    <span class="badge bg-primary">{{ s }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-robot me-2"></i>Análisis de IA</h6>
+                {% if resultado %}
+                <button id="btn-pdf" class="btn btn-sm btn-outline-danger d-none" onclick="downloadPDF()">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </button>
+                {% endif %}
+            </div>
+            <div id="ia-container" class="card-body">
+                <button class="btn btn-sm btn-info w-100" onclick="getAIAnalysis()">Consultar a la IA (CTO)</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<form id="pdfForm" action="/descargar-pdf" method="post" style="display:none;">
+    <input type="hidden" name="tipo" value="Optimización de Servidores">
+    <input type="hidden" name="datos" id="pdf-datos">
+    <input type="hidden" name="resultado" id="pdf-resultado">
+    <input type="hidden" name="ia_analisis" id="pdf-ia">
+</form>
+
+<script>
+    let services = {{ ejemplo_servidores | safe }};
+
+    function renderServices() {
+        const container = document.getElementById('servicesList');
+        container.innerHTML = services.map((s, i) => `
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" placeholder="Nombre" value="${s.nombre}" onchange="updateService(${i}, 'nombre', this.value)">
+                <input type="number" class="form-control" placeholder="Peso" value="${s.peso}" onchange="updateService(${i}, 'peso', this.value)">
+                <input type="number" class="form-control" placeholder="Valor" value="${s.valor}" onchange="updateService(${i}, 'valor', this.value)">
+                <button type="button" class="btn btn-outline-danger" onclick="removeService(${i})">×</button>
+            </div>
+        `).join('');
+    }
+
+    function addService() {
+        services.push({nombre: '', peso: 0, valor: 0});
+        renderServices();
+    }
+
+    function updateService(i, key, val) {
+        services[i][key] = val;
+    }
+
+    function removeService(i) {
+        services.splice(i, 1);
+        renderServices();
+    }
+
+    function updateJson() {
+        document.getElementById('servicios_json').value = JSON.stringify(services);
+    }
+
+    function getAIAnalysis() {
+        const container = document.getElementById('ia-container');
+        container.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-info" role="status"></div> Analizando...</div>';
+        
+        const data = {
+            servidores: "Valor: {{ resultado.valor if resultado else 0 }}, Seleccionados: {{ (resultado.seleccion|join(', ')) if resultado else '' }}",
+            latencia: "0",
+            marketing: "N/A"
+        };
+
+        fetch('/analizar-ia', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'data=' + encodeURIComponent(JSON.stringify(data))
+        })
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+            document.getElementById('btn-pdf').classList.remove('d-none');
+        });
+    }
+
+    function downloadPDF() {
+        document.getElementById('pdf-datos').value = JSON.stringify({{ raw_data | safe if raw_data else '{}' }});
+        document.getElementById('pdf-resultado').value = `Valor Total: {{ resultado.valor if resultado else '' }}\nSelección: {{ (resultado.seleccion|join(', ')) if resultado else '' }}`;
+        document.getElementById('pdf-ia').value = document.getElementById('ia-analisis-input') ? document.getElementById('ia-analisis-input').value : '';
+        document.getElementById('pdfForm').submit();
+    }
+
+    renderServices();
+</script>
+{% endblock %}
