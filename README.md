@@ -1,4 +1,13 @@
-# Calculadora Estrategica Pro
+# Hecho por
+## · Luis Leon 31.139.586 <p align="center">
+  <a href="mailto:leonpizzano@gmail.com"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" /></a>
+  <a href="tel:+584128316804"><img src="https://img.shields.io/badge/Teléfono-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Teléfono" /></a>
+</p>
+
+## · Juan Diego Cordero
+## · Nelson Guerrero 32.067.861
+
+# Calculadora Estrategica
 
 Calculadora Estrategica Pro es una aplicacion web diseñada para la resolucion de problemas de optimizacion mediante modelos matematicos avanzados e integracion con Inteligencia Artificial. La herramienta permite optimizar infraestructuras de servidores, redes de latencia y presupuestos de marketing.
 
